@@ -4,7 +4,7 @@ const cors = require('cors');
 const mysql = require('mysql');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3001;
 
 // MySQL database connection configuration
 const dbConfig = {
@@ -44,18 +44,21 @@ app.use((req, res, next) => {
     try {
         // Loop through fetched endpoints and define routes dynamically
         req.endpoints.forEach(endpoint => {
-            app.get(endpoint.url, async (req, res) => {
-                try {
-                    // Make a request to the open-source API using the base URL from the database
-                    const response = await axios.get(endpoint.baseurl);
-                    // Send the data from the API back to the client side
-                    res.json(response.data);
-                } catch (error) {
-                    // Handle errors
-                    console.error('Error fetching data from API:', error);
-                    res.status(500).json({ error: 'Failed to fetch data from API' });
-                }
-            });
+            // Check if the method is GET
+            if (endpoint.method.toUpperCase() === 'GET') {
+                app.get(endpoint.url, async (req, res) => {
+                    try {
+                        // Make a request to the open-source API using the base URL from the database
+                        const response = await axios.get(endpoint.baseurl);
+                        // Send the data from the API back to the client side
+                        res.json(response.data);
+                    } catch (error) {
+                        // Handle errors
+                        console.error('Error fetching data from API:', error);
+                        res.status(500).json({ error: 'Failed to fetch data from API' });
+                    }
+                });
+            }
         });
         next();
     } catch (error) {
