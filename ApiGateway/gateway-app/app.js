@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const PORT = process.env.PORT || 3001;
-const endpointController = require('./controllers/endpointController');
+const PORT = process.env.PORT || 3002;
+const endpointController = require('./src/controllers/endpointController');
 
 const app = express();
 

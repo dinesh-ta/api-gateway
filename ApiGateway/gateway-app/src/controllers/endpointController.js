@@ -34,4 +34,33 @@ app.use((req, res, next) => {
     }
 });
 
+// Route to concatenate responses from all endpoints in the database
+app.get('/concat/all', async (req, res) => {
+    try {
+        let concatenatedData = [];
+
+        // Loop through fetched endpoints
+        for (const endpoint of req.endpoints) {
+            // Check if the method is GET
+            if (endpoint.method.toUpperCase() === 'GET') {
+                try {
+                    // Fetch data from the API using the base URL from the database
+                    const data = await DataService.fetchDataFromAPI(endpoint.baseurl);
+                    // Concatenate the data to the result array
+                    concatenatedData = concatenatedData.concat(data);
+                } catch (error) {
+                    // Handle errors for individual API requests
+                    console.error(`Error fetching data from API for URL ${endpoint.baseurl}:`, error);
+                }
+            }
+        }
+
+        // Send the concatenated data back to the client side
+        res.json(concatenatedData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 module.exports = app;
